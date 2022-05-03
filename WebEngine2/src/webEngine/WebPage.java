@@ -1,11 +1,10 @@
 package webEngine;
 
 import java.util.HashMap;
+import java.util.List;
 
 import nanoHTTPD.NanoHTTPD;
 import nanoHTTPD.NanoHTTPD.Response;
-import userEngine.User;
-
 import userEngine.User;
 
 public abstract class WebPage {
@@ -14,23 +13,31 @@ public abstract class WebPage {
 	private static final String HTML = NanoHTTPD.MIME_HTML;
 	private static final String CSS = "text/css";
 	private static final String JS = "text/javascript";
+	private URL path;
 	
-	private HashMap<String, WebPage> subPages;
-	private String[] path;
+	protected boolean blockOnNullUser;
 	
-	public WebPage(String[] path) {
+	public WebPage(URL path, boolean nullBlock) {
+		blockOnNullUser = nullBlock;
 		this.path = path.clone();
-		subPages = new HashMap<String, WebPage>();
 	}
 	
-	public abstract WebAction validate(User u);
+	public WebAction canGo(URL path, User u) {
+		if(u == null) {
+			if(blockOnNullUser) {
+				return WebAction.RedirectLog();
+			}
+			return WebAction.Ok();
+		}
+		return validate(path, u);
+	}
 	
-	public abstract Response serve(String path, HashMap<String, String> params);
+	protected abstract WebAction validate(URL path, User u);
 	
-	private Response redirectResponse(String dest) {
-		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, PLAINTEXT, "");
-		r.addHeader("Location", "/login?target=\"/" + dest);
-		return r;
+	public abstract Response serve(URL path, HashMap<String, List<String>> params, String body, User u);
+
+	public URL getURL() {
+		return path;
 	}
 	
 }

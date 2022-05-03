@@ -1,5 +1,7 @@
 package userEngine;
 
+import java.time.Instant;
+
 import dataManagment.JsonObj;
 import dataManagment.JsonSerializable;
 import security.Hasher;
@@ -11,12 +13,14 @@ public class User implements JsonSerializable {
 	private long uuid;
 	private Permisions perms;
 	private String passHash;
+	private long lastLogin;
 	
 	public User(String name, long uuid, String pass) {
 		passHash = Hasher.Hash1(pass);
 		displayName = name;
 		this.uuid = uuid;
 		perms = new Permisions();
+		lastLogin = -1;
 	}
 	public User(JsonObj obj) {
 		deserialize(obj);
@@ -47,6 +51,14 @@ public class User implements JsonSerializable {
 	}
 	public boolean checkPassHash(String passHash) {
 		return this.passHash.equals(passHash);
+	}
+	
+	public void login() {
+		lastLogin = Instant.now().getEpochSecond();
+	}
+	
+	public long getLastLogin() {
+		return lastLogin;
 	}
 
 	@Override
