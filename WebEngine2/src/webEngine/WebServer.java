@@ -1,42 +1,41 @@
 package webEngine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nanoHTTPD.NanoHTTPD;
-import nanoHTTPD.NanoHTTPD.Response;
+import nanoHTTPD.util.ServerRunner;
 import userEngine.User;
 import userEngine.UserDirectory;
+import webEngine.pages.Home;
 
 public class WebServer extends NanoHTTPD {
 
-	private HashMap<URL, WebPage> pages;
+//	private HashMap<URL, WebPage> pages;
+	private ArrayList<WebPage> pages;
 	
 	private UserDirectory users;
 	
 	public WebServer() {
 		super(8080);
-		pages = new HashMap<URL, WebPage>();
-		WebPage p = new WebPage(new URL(""), true) {
+//		pages = new HashMap<URL, WebPage>();
+		pages = new ArrayList<WebPage>();
+		WebPage p = new WebPage(new URL(""), false) {
 
 			@Override
 			public WebAction validate(URL path, User u) {
-				if(u.hasPerm("pages.veiw")) {
-					return WebAction.Ok();
-				} else {
-					return WebAction.Block("Must have permision pages.veiw");
-				}
+				return WebAction.RedirectT("/home");
 			}
 
 			@Override
-			public Response serve(URL path, HashMap<String, List<String>> params, String body, User u) {
-				// TODO Auto-generated method stub
+			public Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u) {
 				return null;
 			}
 			
 		};
-		
+		addPage(p);
+		addPage(new Home());
 	}
 	
 	@Override
@@ -45,7 +44,6 @@ public class WebServer extends NanoHTTPD {
 		URL url = new URL(session.getUri().substring(1));
 		CookieHandler cookies = session.getCookies();
 		Method method = session.getMethod();
-		Map<String, List<String>> postBody = new HashMap<String, List<String>>();
 		String postData = "";
 		
 //		System.out.println("http://localhost:1080/" + printPath(path) + ";\t Method=" + method);
@@ -59,13 +57,12 @@ public class WebServer extends NanoHTTPD {
 				cookies.set("user", "-Delete-", 1);
 			}
 		}
-		
-		if(pages.containsKey(url)) {
-			WebPage page = pages.get(url);
+		WebPage page = getPage(url);
+		if(page != null) {
 			WebAction act = page.canGo(url, user);
 			if(act.act == WebAction.Act.OK) {
 				try {
-					return page.serve(url, params, postData, user);
+					return page.serve(url, method, params, postData, user);
 				} catch(Exception e) {
 					e.printStackTrace();
 					return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("Failed to server page, internal error"));
@@ -81,6 +78,21 @@ public class WebServer extends NanoHTTPD {
 		return missingPage(url);
 	}
 	
+	public WebPage getPage(URL url) {
+		boolean first = true;
+		for(int i = url.path.length-1; i >= 0; i--) {
+			for(WebPage p : pages) {
+				if(p.getURL().equals(url,i)) {
+					if(first || p.getIdPath() == i+1) {
+						return p;
+					}
+				}
+			}
+			first = false;
+		}
+		return null;
+	}
+	
 	public static Response missingPage(URL url) {
 		String page = PageLoader.getPage("404.html");
 		page = page.replace("%Path%", url.toString());
@@ -94,16 +106,20 @@ public class WebServer extends NanoHTTPD {
 	}
 	public static Response redirectLogin(URL path) {
 		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "");
-		r.addHeader("Location", "/login?target=\"/" + dest + "\"");
+		r.addHeader("Location", "/login?target=\"/" + path + "\"");
 		return r;
 	}
 	
 	public boolean addPage(WebPage p) {
-		if(!pages.containsKey(p)) {
-			pages.put(p.getURL(), p);
+		if(getPage(p.getURL()) == null) {
+			pages.add(p);
 			return true;
 		}
 		return false;
+	}
+	
+	public static void main(String[] args) {
+		ServerRunner.run(WebServer.class);
 	}
 	
 }

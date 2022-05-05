@@ -1,0 +1,129 @@
+body {
+	background-color: #151519;
+	color: #d0d0d0;
+	height: 100%;
+}
+.centerBox {
+	border-width: 1px;
+	border-color: #d0d0d0;
+	text-align: center;
+	border-style: solid;
+	width: 40%;
+	padding: 10px;
+	position: fixed;
+	margin-left: 30%;
+	margin-top: 200px;
+	padding-bottom: 40px;
+	padding-top: 0px;
+}
+a.navLink {
+	color: #d0d0d0;
+	text-decoration: none;
+}
+a.navLink:hover {
+	color: rgb(130,180,256);
+	text-decoration: underline;
+}
+a.navLink:visited {
+	color: #d0d0d0;
+	text-decoration: none;
+}
+a.navLink:active {
+	color: rgb(160,200,256);
+	text-decoration: bold;
+}
+.navTable {
+	margin-left: 2%;
+	table-layout: fixed;
+	border: 2px inset #d0d0d0;
+}
+.navTable td {
+	width: 150px;
+	border: none;
+}
+
+td {
+	vertical-align: top;
+}
+.borderd {
+	border: 2px inset #d0d0d0;
+	padding-left: 3px;
+	padding-right: 10px;
+}
+
+input {
+	background-color: #353530;
+	color: #d0d0d0;
+}
+input:focus {
+	background-color: #555540;
+	color: #d0d0d0;
+}
+
+button {
+	background-color: #353530;
+	color: #d0d0d0;
+}
+button:focus {
+	background-color: #555540;
+	color: #d0d0d0;
+}
+
+/* Vertical Menu */
+.vertical-menu {
+  width: 200px;
+  height: 150px;
+  overflow-y: auto;
+}
+.vertical-menu a {
+  /* background-color: #202025; */
+  color: #eee;
+  display: block;
+  padding: 12px;
+  text-decoration: none;
+}
+.vertical-menu a:hover {
+  background-color: #444;
+}
+.vertical-menu a.active {
+  background-color: #04AA6D;
+  color: #d0d0d0;
+}
+
+/* Dropdown Button */
+/* .dropbtn { */
+  /* background-color: #04AA6D; */
+  /* color: white; */
+  /* padding: 16px; */
+  /* font-size: 16px; */
+  /* border: none; */
+/* } */
+/* The container <div> - needed to position the dropdown content */
+.userDropdown {
+	margin-right: 130px;
+	float: right;
+	position: relative;
+	display: inline-block;
+}
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #303040;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+.dropdown-content a {
+  color: #eee;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover {background-color: #444;}
+.userDropdown:hover .dropdown-content {display: block;}
+/* .userDropdown:hover .dropbtn {background-color: #444;} */
+
+.errorText {
+	color: #d00;
+	text-decoration: underline;
+}

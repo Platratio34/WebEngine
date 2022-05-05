@@ -35,13 +35,17 @@ public class URL {
 			if(u.path.length != path.length) {
 				return false;
 			}
-			for(int i = 0; i < path.length; i++) {
-				if(!path[i].equals(u.path[i])) {
-					return false;
-				}
-			}
-			return true;
+			return equals(u, path.length);
 		}
 		return false;
+	}
+	public boolean equals(URL url, int l) {
+		int m = Math.min(Math.min(l, path.length), url.path.length);
+		for(int i = 0; i < m; i++) {
+			if(!path[i].equals(url.path[i])) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

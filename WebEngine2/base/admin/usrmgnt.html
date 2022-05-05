@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Peter Light Ploter - Admin - User Managment</title>
+		<link rel="stylesheet" href="/style/base">
+		<script src="/script/base" charset="utf-8"></script>
+	</head>
+
+	<body onload="init(true); initL()">
+
+		<div class="navPane">
+			<div class="userDropdown">
+				<p class="dropbtn" id="userName">User</p>
+				<div class="dropdown-content" id="userDropList">
+				</div>
+			</div>
+			<h1>User Managment</h1>
+			<table class="navTable">
+				<tr>
+					<td><a class="navLink" href="/home">Home</a></td>
+					<td><a class="navLink" href="/admin">Admin Dashboard</a></td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			List of users things goes here<br>
+
+			<table>
+				<tr>
+					<td style="width:300px"></td>
+					<td>
+						<button onclick="showSection('newUser')">New User</button>
+						<button onclick="showSection('changePerms')">Set Permissions</button>
+						<button onclick="showSection('setPass')">Set Password</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<strong>User:</strong> <output id="cUser"></output><br>
+						<strong>Last Login:</strong> <output id="cUser.lastLogin"></output><br>
+						<br><br>
+						<!-- <select id="permUsers" onchange="updateUserPerms()"></select> -->
+						<input type="text" id="userSearch" placeholder="Search" oninput="updateUserSearch()"></input>
+						<div id="userList" class="vertical-menu">
+						</div>
+					</td>
+					<td>
+						<div id="newUser" style="display:none">
+							<br>
+							New User:<br>
+							Username: <input type="text" id="newUser.name" placeholder="Username"></input><br>
+							Password: <input type="password" id="newUser.pass" placeholder="Password" autocomplete="new-password"></input><br>
+							Permissions: <input type="text" id="newUser.perm" placeholder="Permissions"></input><br>
+							<button onclick="newUser()">Create</button>
+						</div>
+						<div id="changePerms" style="display:none">
+							<br>
+							Add Permission: <input type="text" id="changePerms.add" placeholder="Permission"></input> <button onclick="changePerm('add')">Add</button><br>
+							<br>
+							Remove Permission: <input type="text" id="changePerms.remove" placeholder="Permission"></input> <button onclick="changePerm('remove')">Remove</button><br>
+							<br>
+							Current Permissions:<br>
+							<div id="changePerms.cPerms" class="borderd" style="width:150px; padding:5px"></div><br>
+						</div>
+						<div id="setPass" style="display:none">
+							<br>
+							The new password must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/.<br>
+							<br>
+							New Password: <input id="setPass.new1" type="password" placeholder="Type the password" autocomplete="new-password" onchange="checkNewPass();validatePass()"></input>
+							<output id="setPass.invalid" style="display:none;" class="errorText">Must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/</output><br>
+							New Password: <input id="setPass.new2" type="password" placeholder="Type the password again" autocomplete="new-password" oninput="checkNewPass()"></input>
+							<output id="setPass.new2.bad" style="display:none;" class="errorText">The passwords must match</output><br>
+							<button onclick="setPass()">Set Password</button>
+						</div>
+					</td>
+				</tr>
+		</div>
+
+		<script>
+			let lshow = undefined
+			let users;
+			let cUser;
+
+			let passValid = false;
+
+			function showSection(section) {
+				if(lshow) {
+					lshow.style.display = "none"
+				}
+				lshow = document.getElementById(section)
+				lshow.style.display = "block"
+			}
+
+			function newUser() {
+				newName = document.getElementById("newUser.name").value
+				newPass = document.getElementById("newUser.pass").value
+				newPerm = document.getElementById("newUser.perm").value
+				httpPostAsync("/admin/newUser", "", "name="+newName+"&pass="+newPass+"&perm="+newPerm, function(res) {alert(res);initL()})
+			}
+
+			function initL() {
+				httpGetAsync("/admin/users?list", function(res) {
+					// console.log(res)
+					var list = document.getElementById("userList");
+					list.innerHTML = "";
+					users = JSON.parse(res);
+
+					for(var i = 0; i < users.length; i++) {
+						if(cUser && users[i].name == cUser.name) {
+							updateCUser(i)
+						}
+					    var opt = users[i].name;
+					    var el = document.createElement("a");
+					    el.textContent = opt;
+					    el.href = "javascript:updateCUser("+i+")";
+					    list.appendChild(el);
+					}
+				})
+			}
+
+			function updateCUser(userI) {
+				cUser = users[userI]
+				document.getElementById("cUser").innerHTML = cUser.name
+				if(cUser.lastLogin > 0) {
+					var date = new Date(cUser.lastLogin)
+					document.getElementById("cUser.lastLogin").innerHTML = date.toLocaleString()
+				} else {
+					document.getElementById("cUser.lastLogin").innerHTML = "Never"
+				}
+				dispPerms()
+				// console.log(cUser.name)
+			}
+
+			function dispPerms() {
+				permList = document.getElementById("changePerms.cPerms")
+				permList.innerHTML = "";
+				for(i = 0; i < cUser.perms.length; i++) {
+					permList.innerHTML += cUser.perms[i] + "<br>"
+				}
+			}
+
+			function updateUserSearch() {
+				var list = document.getElementById("userList");
+				var search = document.getElementById("userSearch").value
+				var children = list.children;
+				if(search != "") {
+					for(var i=0; i<children.length; i++){
+						var child = children[i];
+						if(child.textContent.includes(search)) {
+							child.style.display = "block";
+						} else {
+							child.style.display = "none";
+						}
+					}
+				} else {
+					for(var i=0; i<children.length; i++){
+						var child = children[i];
+						child.style.display = "block";
+					}
+				}
+				// for(var i = 0; i < users.length; i++) {
+				// 	var opt = users[i].name;
+				// 	if(opt.includes(search)) {
+				// 		var el = document.createElement("a");
+				// 		el.textContent = opt;
+				// 		el.href = "javascript:updateCUser("+i+")";
+				// 		list.appendChild(el);
+				// 	}
+				// }
+			}
+
+			function updateUserPerms() {
+				permsText = document.getElementById("changePerms.cPerms")
+				val = document.getElementById("permUsers").value
+				for(i = 0; i < users.length; i++) {
+					if(users[i].name == val) {
+						permsText.innerHTML = users[i].perms
+					}
+				}
+			}
+
+			function changePerm(action) {
+				var perm = document.getElementById("changePerms."+action).value
+				httpPostAsync2("/admin/user", "" , "action="+action+"Perm&perm="+perm+"&user="+cUser.name, function(res){
+					if(res.status == 200) {
+						initL();
+					} else {
+						alert(res.responseText);
+					}
+				});
+			}
+
+			function checkNewPass() {
+				p1 = document.getElementById('setPass.new1').value
+				p2 = document.getElementById('setPass.new2').value
+				b = document.getElementById('setPass.new2.bad')
+				if(p1 == p2) {
+					b.style.display = 'none'
+					return true;
+				} else {
+					b.style.display = 'inline-block'
+					return false;
+				}
+			}
+
+			function setPass() {
+				if(!cUser) {
+					alert("Select a user first")
+				}
+				if(!checkNewPass()) {
+					return;
+				}
+				if(!passValid) {
+					return;
+				}
+
+				pass = document.getElementById("setPass.new1").value
+				httpPostAsync("/admin/user", "", "action=setPass&user="+cUser.name+"&pass="+pass, function(res){alert(res)})
+			}
+
+			function validatePass() {
+				let nPass = document.getElementById("setPass.new1").value;
+				if(nPass.length < 10) {
+					invalidPass();
+					return;
+				}
+				if(!containsSpecialChars(nPass)) {
+					invalidPass();
+					return;
+				}
+				if(!containsAlpha(nPass)) {
+					invalidPass();
+					return;
+				}
+				if(containsInvalid(nPass)) {
+					invalidPass();
+					return;
+				}
+				passValid = true;
+				document.getElementById("setPass.invalid").style.display = "none";
+			}
+
+			function invalidPass() {
+				if(document.getElementById("setPass.new1").value.length > 0)
+					document.getElementById("setPass.invalid").style.display = "inline-block";
+				passValid = false;
+			}
+
+			function containsSpecialChars(str) {
+	  			const specialChars = /[!@#$%*_+-=|?~0123456789]/;
+				return specialChars.test(str);
+			}
+			function containsAlpha(str) {
+	  			const specialChars = /[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]/;
+				return specialChars.test(str);
+			}
+			function containsInvalid(str) {
+	  			const specialChars = /[`'"^&*()\[\]{}|,.<>\\\/]/;
+				return specialChars.test(str);
+			}
+		</script>
+	</body>
+</html>

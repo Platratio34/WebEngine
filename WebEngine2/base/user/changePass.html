@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Peter Light Ploter - Profile</title>
+		<link rel="stylesheet" href="/style/base">
+		<script src="/script/base" charset="utf-8"></script>
+	</head>
+
+	<body onload="init(true)">
+
+		<div class="navPane">
+			<div class="userDropdown">
+				<p class="dropbtn" id="userName">User</p>
+				<div class="dropdown-content" id="userDropList">
+				</div>
+			</div>
+			<h1>Change Password</h1>
+			<table class="navTable">
+				<tr>
+					<td><a class="navLink" href="/home">Home</a></td>
+					<td><a class="navLink" href="/user/changePass">Change Password</a></td>
+					<td data-perm="admin" style="display:none"><a class="navLink" href="/admin">Admin Dashboard</a></td>
+				</tr>
+			</table>
+		</div>
+		<br>
+		<div>
+			Current Password: <input id="oPass" type="password" placeholder="Current Password"></input><br>
+			<br>
+			The new password must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/.<br>
+			<br>
+			New Password: <input id="nPass0" type="password" placeholder="Input new password" autocomplete="new-password" onchange="validate()"></input>
+			<output id="passInvalid" style="display:none; color:red">Must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/</output><br>
+			New Password: <input id="nPass1" type="password" placeholder="Input new password again" autocomplete="new-password"></input>
+			<output id="passMismatch" style="display:none; color:red">The passwords must match</output><br>
+			<br>
+			<button onclick="changePass()">Change Password</button>
+			<br>
+			<div id="loginFailed" style="color:red; display:none">
+				Incorrect Password.
+			</div>
+		</div>
+	</body>
+
+	<script>
+		let valid = false;
+		function changePass() {
+			let oPass = document.getElementById("oPass").value
+			let nPass = document.getElementById("nPass0").value
+			let nPass2 = document.getElementById("nPass1").value
+
+			if(!valid) {
+				return;
+			}
+
+			if(nPass != nPass2) {
+				document.getElementById("passMismatch").style.display = "inline-block";
+				return;
+			}
+			httpPostAsync2("/user/setPass", "", "oPass="+oPass+"&nPass="+nPass, function(res) {
+				if(res.status == 200) {
+					window.location.href = "/user/profile";
+				} else {
+					document.getElementById("loginFailed").style.display = "inline-block";
+					document.getElementById("loginFailed").innerHTML = "Incorrect Password.";
+				}
+			});
+		}
+
+		function validate() {
+			let nPass = document.getElementById("nPass0").value;
+			if(nPass.length < 10) {
+				invalid();
+				return;
+			}
+			if(!containsSpecialChars(nPass)) {
+				invalid();
+				return;
+			}
+			if(!containsAlpha(nPass)) {
+				invalid();
+				return;
+			}
+			if(containsInvalid(nPass)) {
+				invalid();
+				return;
+			}
+			valid = true;
+			document.getElementById("passInvalid").style.display = "none";
+		}
+
+		function invalid() {
+			document.getElementById("passInvalid").style.display = "inline-block";
+			valid = false;
+		}
+
+		function containsSpecialChars(str) {
+  			const specialChars = /[!@#$%*_+-=|?~0123456789]/;
+			return specialChars.test(str);
+		}
+		function containsAlpha(str) {
+  			const specialChars = /[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]/;
+			return specialChars.test(str);
+		}
+		function containsInvalid(str) {
+  			const specialChars = /[`'"^&*()\[\]{}|,.<>\\\/]/;
+			return specialChars.test(str);
+		}
+	</script>
+</html>

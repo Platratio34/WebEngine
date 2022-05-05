@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Peter Light Ploter</title>
+		<link rel="stylesheet" href="/style/base">
+		<script src="/script/base" charset="utf-8"></script>
+	</head>
+
+	<body>
+
+		<div class="navPane">
+			<h1>Peter Light Ploter</h1>
+			<table class="navTable">
+				<tr>
+					<td><a class="navLink" href="/home">Home</a></td>
+				</tr>
+			</table>
+		</div>
+		<div class="centerBox">
+			<h1>Login</h1>
+			Username: <input type="text" id="username"><br>
+			Password: <input type="password" id="password"><br>
+			<button onClick="login()">Login</button>
+			<div id="loginFailed" style="display:none" class="errorText">
+				<br>
+				Login Failed.<br>
+				Incorrect Username or Password.
+			</div>
+		</div>
+
+	</body>
+
+	<script>
+		function login() {
+			let user = document.getElementById('username').value
+			let pass = document.getElementById('password').value
+			// alert("Atemtping login for "+user+"@peterWebPloter with password \""+pass+"\"")
+			httpPostAsync("/login", "", "user="+user+"&pass="+pass, function(res) {
+					if(res == "Login Succseful") {
+						document.cookie = "user=" + user + "; path=/";
+						if(urlParams.has("target")) {
+							console.log("thing");
+							window.location.href = urlParams.get('target');
+						} else {
+							window.location.href = "/home";
+						}
+					} else {
+    					document.getElementById("loginFailed").style.display = "block";
+					}
+			});
+		}
+	</script>
+</html>

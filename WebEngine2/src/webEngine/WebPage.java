@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import nanoHTTPD.NanoHTTPD;
+import nanoHTTPD.NanoHTTPD.Method;
 import nanoHTTPD.NanoHTTPD.Response;
 import userEngine.User;
 
@@ -16,6 +17,7 @@ public abstract class WebPage {
 	private URL path;
 	
 	protected boolean blockOnNullUser;
+	protected int idPath = -1;
 	
 	public WebPage(URL path, boolean nullBlock) {
 		blockOnNullUser = nullBlock;
@@ -34,10 +36,17 @@ public abstract class WebPage {
 	
 	protected abstract WebAction validate(URL path, User u);
 	
-	public abstract Response serve(URL path, HashMap<String, List<String>> params, String body, User u);
+	public abstract Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u);
+	
+	protected static Response returnPage(String path) {
+		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, HTML, PageLoader.getPage(path));
+	}
 
 	public URL getURL() {
 		return path;
+	}
+	public int getIdPath() {
+		return idPath;
 	}
 	
 }
