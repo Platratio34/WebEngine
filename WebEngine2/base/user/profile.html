@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Peter Light Ploter - Profile</title>
+		<title>Peter Web Engine - Profile</title>
 		<link rel="stylesheet" href="/style/base">
 		<script src="/script/base" charset="utf-8"></script>
 	</head>
 
-	<body onload="init(true)">
+	<body onload="init(true);init2()">
 
 		<div class="navPane">
 			<div class="userDropdown">
@@ -19,13 +19,39 @@
 			<table class="navTable">
 				<tr>
 					<td><a class="navLink" href="/home">Home</a></td>
-					<td><a class="navLink" href="/user/changePass">Change Password</a></td>
+					<td><a class="navLink" href="/user/changePass" id="link.changePass" style="display:none">Change Password</a></td>
 					<td data-perm="admin" style="display:none"><a class="navLink" href="/admin">Admin Dashboard</a></td>
 				</tr>
 			</table>
 		</div>
 		<div>
-			<h3>Welcome <span class=".userName">User</span></h3>
+			<h3 class="profUserName">User</h3>
+
+			<h4>Last Online: <span id="lastOnline"></span></h4>
+
+			<h4>Bio:</h4>
+			<div id="userBio"></div>
 		</div>
+
+		<script>
+			userData = null;
+			function init2() {
+				httpGetAsync("?data", function(res) {
+					userData = JSON.parse(res);
+					effected = document.querySelectorAll('.profUserName');
+				    for(i = 0; i < effected.length; i++) {
+				        effected[i].innerHTML = userData.dsp;
+				    }
+					document.title = "Peter Web Engine - " + userData.dsp + " - Profile";
+					document.getElementById("lastOnline").innerHTML = new Date(userData.last*1000).toLocaleDateString("en-US");
+					if(userData.data != undefined && userData.data.bio != undefined) {
+						document.getElementById("userBio").innerHTML = user.data.bio;
+					}
+					if(user.dsp == user) {
+						document.getElementById("link.changePass").style.display = "inline-block";
+					}
+				});
+			}
+		</script>
 	</body>
 </html>
