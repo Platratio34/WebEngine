@@ -11,13 +11,13 @@ public class Perm {
 	protected boolean has;
 	
 	public Perm(String perm) {
-		this(perm.split("."), 0);
+		this(perm.split("\\."), 0);
 	}
 	public Perm(String[] perm, int i) {
 		subPerms = new HashMap<String, Perm>();
-		permArr = Arrays.copyOfRange(perm, 0, i + 1);;
-		if(permArr.length > permArr.length) {
-			setPerm(permArr, i+1, true);
+		permArr = Arrays.copyOfRange(perm, 0, i);
+		if(perm.length > i+1) {
+			setPerm(perm, i+1, true);
 		}
 	}
 	
@@ -40,7 +40,7 @@ public class Perm {
 	}
 	
 	public boolean hasPerm(String p) {
-		return hasPerm(p.split("."));
+		return hasPerm(p.split("\\."));
 	}
 	public boolean hasPerm(String[] pA) {
 		if(pA.length == permArr.length) 

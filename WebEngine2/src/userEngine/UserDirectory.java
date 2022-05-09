@@ -1,8 +1,12 @@
 package userEngine;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import dataManagment.JsonObj;
+import database.MySQL;
 import security.Key;
 import security.KeyManager;
 
@@ -12,9 +16,22 @@ public class UserDirectory {
 	
 	private KeyManager<User> keyManager;
 	
-	public UserDirectory() {
+	private MySQL database;
+	
+	public UserDirectory(MySQL database) {
+		this.database = database;
 		users = new HashMap<Long, User>();
 		keyManager = new KeyManager<User>();
+		try {
+			ResultSet rset = database.select("users", "*", "data");
+			while(rset.next()) {
+				JsonObj data = JsonObj.parseD(rset.getString("data"));
+				addUser(new User(data));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		System.out.println("Thing falied");
 	}
 	
 	public boolean addUser(User u) {
@@ -60,5 +77,11 @@ public class UserDirectory {
 			return k.getValue();
 		}
 		return null;
+	}
+	
+	public void saveUsers() {
+		for(User u : users.values()) {
+			database.setColm("users", "uuid = " + u.getUUID(), "data = \"" + u.serialize() + "\"");
+		}
 	}
 }

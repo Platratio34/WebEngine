@@ -34,14 +34,11 @@ public class ProfilePage extends WebPage {
 
 	@Override
 	public Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u, CookieHandler cookies) {
-		if(path.path.length == 3) {
+		if(!params.containsKey("data")) {
 			return returnPage("user/profile");
 		} else {
-			if(path.equals("data",3)) {
-				User u2 = server.users.getUserByUUID(Long.parseLong(path.path[2]));
-				return returnOkJSON(u2.getData());
-			}
-			return badRequest("Path may only be user/profile/uuid or user/profile/uuid/data");
+			User u2 = server.users.getUserByUUID(Long.parseLong(path.path[2]));
+			return returnOkJSON(u2.getVeiwData());
 		}
 	}
 

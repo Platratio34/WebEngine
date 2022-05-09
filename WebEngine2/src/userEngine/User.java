@@ -70,6 +70,8 @@ public class User implements JsonSerializable {
 		obj.setKey("uuid", uuid);
 		obj.setKey("pass", passHash);
 		obj.setKey("perms", perms);
+		obj.setKey("last", lastLogin);
+		obj.setKey("data", data);
 		return obj;
 	}
 
@@ -78,7 +80,9 @@ public class User implements JsonSerializable {
 		displayName = obj.getKey("dsp").string();
 		uuid = obj.getKey("uuid").longInt();
 		passHash = obj.getKey("pass").string();
+		lastLogin = obj.getKey("last").longInt();
 		perms = new Permisions(obj.getKey("perms"));
+		data = obj.getKey("data");
 	}
 	public JsonObj getPermsJSON() {
 		return perms.serialize();
@@ -86,5 +90,14 @@ public class User implements JsonSerializable {
 	
 	public JsonObj getData() {
 		return new JsonObj(data);
+	}
+	
+	public JsonObj getVeiwData() {
+		JsonObj obj = new JsonObj();
+		obj.setKey("dsp", displayName);
+		obj.setKey("uuid", uuid);
+		obj.setKey("last", lastLogin);
+		obj.setKey("data", data);
+		return obj;
 	}
 }

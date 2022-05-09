@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import database.MySQL;
 import nanoHTTPD.NanoHTTPD;
 import nanoHTTPD.util.ServerRunner;
 import userEngine.User;
@@ -15,6 +16,7 @@ import userEngine.UserDirectory;
 import webEngine.pages.Home;
 import webEngine.pages.Login;
 import webEngine.pages.PermsPage;
+import webEngine.pages.ProfilePage;
 
 public class WebServer extends NanoHTTPD {
 
@@ -23,11 +25,14 @@ public class WebServer extends NanoHTTPD {
 	
 	public UserDirectory users;
 	
+	public MySQL database;
+	
 	public WebServer() {
 		super(80);
+		database = new MySQL("jdbc:mysql://localhost:3306/webServer?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC", "web-server", "WebServer");
 //		pages = new HashMap<URL, WebPage>();
 		pages = new ArrayList<WebPage>();
-		users = new UserDirectory();
+		users = new UserDirectory(database);
 		WebPage p = new WebPage("", false) {
 
 			@Override
@@ -45,6 +50,7 @@ public class WebServer extends NanoHTTPD {
 		addPage(new Home());
 		addPage(new Login());
 		addPage(new PermsPage());
+		addPage(new ProfilePage());
 	}
 	
 	@Override
@@ -161,7 +167,10 @@ public class WebServer extends NanoHTTPD {
 	public static void main(String[] args) {
 //		ServerRunner.run(WebServer.class);
 		WebServer server = new WebServer();
-		server.users.addUser(new User("Peter",0,"PeterPass1"));
+		User peter = new User("Peter",0,"PeterPass1");
+		peter.setPerm("users.veiw.others", true);
+		server.users.addUser(peter);
+		server.users.addUser(new User("Admin",1,"ThisIsTheAdminPassword"));
 		ServerRunner.executeInstance(server);
 	}
 	

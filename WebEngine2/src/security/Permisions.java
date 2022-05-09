@@ -18,7 +18,7 @@ public class Permisions implements JsonSerializable {
 	}
 	
 	public void setPerm(String perm, boolean has) {
-		setPerm(perm.split("."), has);
+		setPerm(perm.split("\\."), has);
 	}
 	public void setPerm(String[] perm, boolean has) {
 		if(perms.containsKey(perm[0])) {
@@ -29,7 +29,7 @@ public class Permisions implements JsonSerializable {
 	}
 	
 	public boolean hasPerm(String perm) {
-		return hasPerm(perm.split("."));
+		return hasPerm(perm.split("\\."));
 	}
 	public boolean hasPerm(String[] perm) {
 		if(perms.containsKey(perm[0])) {

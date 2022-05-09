@@ -46,8 +46,8 @@ public class Login extends WebPage {
 			return newFixedLengthResponse(Response.Status.OK, PLAINTEXT, "Invalid Username or Password");
 		}
 		cookies.set("userKey",key.getKey(),1);
-		System.out.println(key.getKey());
-		System.out.println(cookies.read("userKey"));
+//		System.out.println(key.getKey());
+//		System.out.println(cookies.read("userKey"));
 //		cookies.set("user",key.getValue().getName(),1);
 //		System.out.println(cookies.read("user"));
 		return newFixedLengthResponse(Response.Status.OK, PLAINTEXT, "Login Successful");
