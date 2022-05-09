@@ -27,6 +27,14 @@ public class URL {
 		}
 		return str;
 	}
+	public String toString(int start) {
+		String str = "";
+		for(int i = start; i < path.length; i++) {
+			if(i > 0) str += "/";
+			str += path[i];
+		}
+		return str;
+	}
 	
 	@Override
 	public boolean equals(Object o) {
@@ -47,5 +55,18 @@ public class URL {
 			}
 		}
 		return true;
+	}
+	public boolean equals(String path, int l) {
+		return equals(new URL(path));
+	}
+	public boolean equals(String path) {
+		return equals(new URL(path));
+	}
+	
+	public boolean equalsAt(String elm, int i) {
+		if(path.length > i) {
+			return path[i].equals(elm);
+		}
+		return false;
 	}
 }

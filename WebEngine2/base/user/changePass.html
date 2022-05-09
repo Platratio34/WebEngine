@@ -7,7 +7,7 @@
 		<script src="/script/base" charset="utf-8"></script>
 	</head>
 
-	<body onload="init(true)">
+	<body onload="init(true);init2()">
 
 		<div class="navPane">
 			<div class="userDropdown">
@@ -30,6 +30,7 @@
 			<br>
 			The new password must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/.<br>
 			<br>
+			<input id="ursName" type="text" autocomplete="username" hidden></input>
 			New Password: <input id="nPass0" type="password" placeholder="Input new password" autocomplete="new-password" onchange="validate()"></input>
 			<output id="passInvalid" style="display:none; color:red">Must contain at least 10 charecters, at least 1 special charecter, at least 1 letter, and may not contain `^'&amp"*()[]{}|,\.&lsaquo;&rsaquo;/</output><br>
 			New Password: <input id="nPass1" type="password" placeholder="Input new password again" autocomplete="new-password"></input>
@@ -44,6 +45,9 @@
 	</body>
 
 	<script>
+		function init2() {
+			document.getElementById("usrName").value = user;
+		}
 		let valid = false;
 		function changePass() {
 			let oPass = document.getElementById("oPass").value

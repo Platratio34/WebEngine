@@ -1,5 +1,9 @@
 package webEngine;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,19 +13,22 @@ import nanoHTTPD.util.ServerRunner;
 import userEngine.User;
 import userEngine.UserDirectory;
 import webEngine.pages.Home;
+import webEngine.pages.Login;
+import webEngine.pages.PermsPage;
 
 public class WebServer extends NanoHTTPD {
 
 //	private HashMap<URL, WebPage> pages;
 	private ArrayList<WebPage> pages;
 	
-	private UserDirectory users;
+	public UserDirectory users;
 	
 	public WebServer() {
-		super(8080);
+		super(80);
 //		pages = new HashMap<URL, WebPage>();
 		pages = new ArrayList<WebPage>();
-		WebPage p = new WebPage(new URL(""), false) {
+		users = new UserDirectory();
+		WebPage p = new WebPage("", false) {
 
 			@Override
 			public WebAction validate(URL path, User u) {
@@ -29,13 +36,15 @@ public class WebServer extends NanoHTTPD {
 			}
 
 			@Override
-			public Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u) {
+			public Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u, CookieHandler cookies) {
 				return null;
 			}
 			
 		};
 		addPage(p);
 		addPage(new Home());
+		addPage(new Login());
+		addPage(new PermsPage());
 	}
 	
 	@Override
@@ -45,6 +54,17 @@ public class WebServer extends NanoHTTPD {
 		CookieHandler cookies = session.getCookies();
 		Method method = session.getMethod();
 		String postData = "";
+		if(method == Method.POST) {
+			try {
+				final HashMap<String, String> map = new HashMap<String, String>();
+				session.parseBody(map);
+				postData = map.get("postData");
+			} catch(IOException e) {
+				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOExceptoin: " + e.getMessage());
+			} catch(ResponseException e) {
+				return newFixedLengthResponse(e.getStatus(), MIME_PLAINTEXT, e.getMessage());
+			}
+		}
 		
 //		System.out.println("http://localhost:1080/" + printPath(path) + ";\t Method=" + method);
 		
@@ -57,12 +77,31 @@ public class WebServer extends NanoHTTPD {
 				cookies.set("user", "-Delete-", 1);
 			}
 		}
+//		System.out.println(url);
+		if(url.equals("favicon.ico")) {
+			try {
+				InputStream is = new FileInputStream(new File("base/favicon.ico"));
+				return newChunkedResponse(Response.Status.OK, "image/x-icon", is);
+			} catch (IOException e) {
+				System.out.println("Faild to load favicon.ico");
+				e.printStackTrace();
+				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Failed to load icon");
+			}
+		}
+		if(url.equalsAt("script", 0)) {
+			return newFixedLengthResponse(Response.Status.OK, "text/javascript", PageLoader.getJS(url.toString(1)));
+		}
+		if(url.equalsAt("style", 0)) {
+			return newFixedLengthResponse(Response.Status.OK, "text/css", PageLoader.getCSS(url.toString(1)));
+		}
 		WebPage page = getPage(url);
 		if(page != null) {
 			WebAction act = page.canGo(url, user);
+//			System.out.println(act.toString());
 			if(act.act == WebAction.Act.OK) {
 				try {
-					return page.serve(url, method, params, postData, user);
+//					System.out.println("Severing page " + url);
+					return page.serve(url, method, params, postData, user, cookies);
 				} catch(Exception e) {
 					e.printStackTrace();
 					return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("Failed to server page, internal error"));
@@ -80,7 +119,7 @@ public class WebServer extends NanoHTTPD {
 	
 	public WebPage getPage(URL url) {
 		boolean first = true;
-		for(int i = url.path.length-1; i >= 0; i--) {
+		for(int i = url.path.length; i >= 1; i--) {
 			for(WebPage p : pages) {
 				if(p.getURL().equals(url,i)) {
 					if(first || p.getIdPath() == i+1) {
@@ -100,12 +139,12 @@ public class WebServer extends NanoHTTPD {
 	}
 	
 	public static Response redirectResponse(String dest) {
-		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "");
+		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to " + dest);
 		r.addHeader("Location", dest);
 		return r;
 	}
 	public static Response redirectLogin(URL path) {
-		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "");
+		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to login");
 		r.addHeader("Location", "/login?target=\"/" + path + "\"");
 		return r;
 	}
@@ -113,13 +152,17 @@ public class WebServer extends NanoHTTPD {
 	public boolean addPage(WebPage p) {
 		if(getPage(p.getURL()) == null) {
 			pages.add(p);
+			p.setWebServer(this);
 			return true;
 		}
 		return false;
 	}
 	
 	public static void main(String[] args) {
-		ServerRunner.run(WebServer.class);
+//		ServerRunner.run(WebServer.class);
+		WebServer server = new WebServer();
+		server.users.addUser(new User("Peter",0,"PeterPass1"));
+		ServerRunner.executeInstance(server);
 	}
 	
 }

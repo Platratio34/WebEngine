@@ -19,8 +19,10 @@
 		</div>
 		<div class="centerBox">
 			<h1>Login</h1>
-			Username: <input type="text" id="username"><br>
-			Password: <input type="password" id="password"><br>
+			<form>
+				Username: <input type="text" id="username" autocomplete="username"><br>
+				Password: <input type="password" id="password" autocomplete="current-password"><br>
+			</form>
 			<button onClick="login()">Login</button>
 			<div id="loginFailed" style="display:none" class="errorText">
 				<br>
@@ -35,9 +37,9 @@
 		function login() {
 			let user = document.getElementById('username').value
 			let pass = document.getElementById('password').value
-			// alert("Atemtping login for "+user+"@peterWebPloter with password \""+pass+"\"")
-			httpPostAsync("/login", "", "user="+user+"&pass="+pass, function(res) {
-					if(res == "Login Succseful") {
+			// alert("Attempting login for "+user+"@peterWebPloter with password \""+pass+"\"}")
+			httpPostAsync("/login", "", "{\"user\":\""+user+"\",\"pass\":\""+pass+"\"}", function(res) {
+					if(res == "Login Successful") {
 						document.cookie = "user=" + user + "; path=/";
 						if(urlParams.has("target")) {
 							console.log("thing");

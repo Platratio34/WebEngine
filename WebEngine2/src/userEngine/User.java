@@ -15,6 +15,8 @@ public class User implements JsonSerializable {
 	private String passHash;
 	private long lastLogin;
 	
+	private JsonObj data;
+	
 	public User(String name, long uuid, String pass) {
 		passHash = Hasher.Hash1(pass);
 		displayName = name;
@@ -77,5 +79,12 @@ public class User implements JsonSerializable {
 		uuid = obj.getKey("uuid").longInt();
 		passHash = obj.getKey("pass").string();
 		perms = new Permisions(obj.getKey("perms"));
+	}
+	public JsonObj getPermsJSON() {
+		return perms.serialize();
+	}
+	
+	public JsonObj getData() {
+		return new JsonObj(data);
 	}
 }

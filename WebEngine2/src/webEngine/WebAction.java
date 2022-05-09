@@ -23,6 +23,11 @@ public class WebAction {
 		return new WebAction(Act.REDIRECT_LOGIN, "");
 	}
 	
+	@Override
+	public String toString() {
+		return "{"+act + ", " + data + "}";
+	}
+	
 	public enum Act {
 		OK,
 		BLOCK,

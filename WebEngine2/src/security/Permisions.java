@@ -40,13 +40,11 @@ public class Permisions implements JsonSerializable {
 
 	@Override
 	public JsonObj serialize() {
-		// TODO Auto-generated method stub
-		return null;
+		return new JsonObj();
 	}
 
 	@Override
 	public void deserialize(JsonObj obj) {
-		// TODO Auto-generated method stub
 		
 	}
 	

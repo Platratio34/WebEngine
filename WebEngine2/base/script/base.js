@@ -129,10 +129,10 @@ function logout() {
     // httpPostAsync("/login","","logout", function(res){alert(res)})
 }
 function isLoggedIn() {
-    key = readCookie("loginKey")
+    key = readCookie("userKey")
     if(!user || user == "" || user == "-Delete-" || !key || key == "" || key == "-Delete-") {
         document.cookie = "user=-Delete-;path=/"
-        document.cookie = "loginKey=-Delete-;path=/"
+        document.cookie = "userKey=-Delete-;path=/"
         return false;
     } else {
         return true;
