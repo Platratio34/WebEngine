@@ -21,6 +21,7 @@ public abstract class WebPage {
 	protected WebServer server;
 	
 	protected boolean blockOnNullUser;
+	protected WebAction onNullAction = WebAction.Ok();
 	protected int idPath = -1;
 	
 	public WebPage(URL path, boolean nullBlock) {
@@ -29,6 +30,13 @@ public abstract class WebPage {
 	}
 	public WebPage(String path, boolean nullBlock) {
 		this(new URL(path), nullBlock);
+	}
+	public WebPage(URL path, WebAction nullAction) {
+		onNullAction = nullAction;
+		this.path = path.clone();
+	}
+	public WebPage(String path, WebAction nullAction) {
+		this(new URL(path), nullAction);
 	}
 	
 	public void setWebServer(WebServer server) {
@@ -40,7 +48,7 @@ public abstract class WebPage {
 			if(blockOnNullUser) {
 				return WebAction.RedirectLog();
 			}
-			return WebAction.Ok();
+			return onNullAction;
 		}
 		return validate(path, u);
 	}
@@ -69,6 +77,9 @@ public abstract class WebPage {
 	}
 	protected static Response returnOkJSON(JsonSerializable obj) {
 		return returnOkJSON(obj.serialize().toString());
+	}
+	protected static Response defaultPage(String msg) {
+		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, HTML, PageLoader.getDefaultPage(msg));
 	}
 
 	public URL getURL() {

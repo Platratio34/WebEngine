@@ -13,6 +13,7 @@ import nanoHTTPD.NanoHTTPD;
 import nanoHTTPD.util.ServerRunner;
 import userEngine.User;
 import userEngine.UserDirectory;
+import webEngine.pageTypes.RedirectPage;
 import webEngine.pages.Home;
 import webEngine.pages.Login;
 import webEngine.pages.PermsPage;
@@ -30,23 +31,9 @@ public class WebServer extends NanoHTTPD {
 	public WebServer() {
 		super(80);
 		database = new MySQL("jdbc:mysql://localhost:3306/webServer?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC", "web-server", "WebServer");
-//		pages = new HashMap<URL, WebPage>();
 		pages = new ArrayList<WebPage>();
 		users = new UserDirectory(database);
-		WebPage p = new WebPage("", false) {
-
-			@Override
-			public WebAction validate(URL path, User u) {
-				return WebAction.RedirectT("/home");
-			}
-
-			@Override
-			public Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u, CookieHandler cookies) {
-				return null;
-			}
-			
-		};
-		addPage(p);
+		addPage(new RedirectPage("", "/home"));
 		addPage(new Home());
 		addPage(new Login());
 		addPage(new PermsPage());
@@ -103,10 +90,10 @@ public class WebServer extends NanoHTTPD {
 		WebPage page = getPage(url);
 		if(page != null) {
 			WebAction act = page.canGo(url, user);
-//			System.out.println(act.toString());
+//			System.out.println(act);
 			if(act.act == WebAction.Act.OK) {
 				try {
-//					System.out.println("Severing page " + url);
+//					System.out.println("Severing page \"" + url + "\"");
 					return page.serve(url, method, params, postData, user, cookies);
 				} catch(Exception e) {
 					e.printStackTrace();

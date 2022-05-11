@@ -25,7 +25,7 @@ public class UserDirectory {
 		try {
 			ResultSet rset = database.select("users", "*", "data");
 			while(rset.next()) {
-				JsonObj data = JsonObj.parseD(rset.getString("data"));
+				JsonObj data = JsonObj.parseD(rset.getString("data").replace("\\\"","\""));
 				addUser(new User(data));
 			}
 		} catch (Exception e) {
@@ -81,7 +81,7 @@ public class UserDirectory {
 	
 	public void saveUsers() {
 		for(User u : users.values()) {
-			database.setColm("users", "uuid = " + u.getUUID(), "data = \"" + u.serialize() + "\"");
+			database.setColm("users", "uuid = " + u.getUUID(), "data = \"" + u.serialize().toStringC().replace("\"","\\\"") + "\"");
 		}
 	}
 }
