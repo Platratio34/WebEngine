@@ -155,9 +155,16 @@ public class WebServer extends NanoHTTPD {
 //		ServerRunner.run(WebServer.class);
 		WebServer server = new WebServer();
 		User peter = new User("Peter",0,"PeterPass1");
-		peter.setPerm("users.veiw.others", true);
+		peter.setPerm(ProfilePage.VIEW_OTHERS_PERM, true);
+		peter.setPerm("admin.*", true);
 		server.users.addUser(peter);
-		server.users.addUser(new User("Admin",1,"ThisIsTheAdminPassword"));
+		System.out.println(peter.serialize());
+		
+		User admin = new User("Admin",1,"ThisIsTheAdminPassword");
+		admin.setPerm("user.*", true);
+		server.users.addUser(admin);
+		System.out.println(admin.serialize());
+		
 		ServerRunner.executeInstance(server);
 	}
 	

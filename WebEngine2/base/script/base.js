@@ -36,15 +36,15 @@ function updatePerms(str) {
     // console.log(str)
     perms = JSON.parse(str)
     effected = document.querySelectorAll('[data-perm]');
-    for(i = 0; i < effected.length; i++) {
+    for(let i = 0; i < effected.length; i++) {
         if(effected[i].dataset.perm == "!any") {
-            if(perms.length == 0) {
+            if(Object.keys(perms).length == 0) {
                 effected[i].style.display = "inline-block"
             } else {
                 effected[i].style.display = "none"
             }
         } else {
-            has = hasPerm(effected[i].dataset.perm)
+            let has = hasPerm(effected[i].dataset.perm)
             // console.log("perm: " + effected[i].dataset.perm + "; " + has)
             if(has) {
                 effected[i].style.display = "inline-block"
@@ -60,7 +60,7 @@ function httpGetAsync(theUrl, callback) {
     httpGetAsync2(theUrl, function(res) {
         if (res.status == 200) {
             callback(res.responseText);
-          }
+        }
     })
 }
 function httpGetAsync2(theUrl, callback) {
@@ -139,23 +139,28 @@ function isLoggedIn() {
     }
 }
 function hasPerm(perm) {
-    if(perms.includes(perm)) {
-        return true
+    if(perms[perm] != undefined) {
+        return perms[perm]
     }
-    if(perms.includes("*")) {
-        return true
-    }
-    if(perms.includes(perm+".*")) {
-		return true
+    let p = perm.split(".");
+	let o = false;
+	for(let i = 0 ; i < p.length; i++) {
+		let P = permArrToString(p, i) + ".*";
+		if(perms[P] != undefined) {
+			o = perms[P];
+		}
+		P = permArrToString(p, i+1);
+		if(perms[P] != undefined) {
+			o = perms[P];
+		}
 	}
-    if(perm.includes(".")) {
-        for(i = perm.length; i > 0; i--) {
-            if(perm.slice(i-1,i) == ".") {
-                if(perms.includes( perm.slice(0,i) + "*") ) {
-                    return true
-                }
-            }
-        }
-    }
-    return false
+    return o
+}
+function permArrToString(arr, m) {
+    let perm = "";
+	for(let i = 0; i < m && i < arr.length; i++) {
+		if(i>0) perm += ".";
+		perm += arr[i];
+	}
+	return perm;
 }
