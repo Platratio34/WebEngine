@@ -1,7 +1,6 @@
 package userEngine;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -83,5 +82,13 @@ public class UserDirectory {
 		for(User u : users.values()) {
 			database.setColm("users", "uuid = " + u.getUUID(), "data = \"" + u.serialize().toStringC().replace("\"","\\\"") + "\"");
 		}
+	}
+
+	public boolean changePass(User u, String oPass, String nPass) {
+		if(u.changePass(oPass, nPass)) {
+			database.setColm("users", "uuid = " + u.getUUID(), "data = \"" + u.serialize().toStringC().replace("\"","\\\"") + "\"");
+			return true;
+		}
+		return false;
 	}
 }

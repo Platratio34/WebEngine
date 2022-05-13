@@ -100,4 +100,9 @@ public class User implements JsonSerializable {
 		obj.setKey("data", data);
 		return obj;
 	}
+	public boolean changePass(String oPass, String nPass) {
+		if(!checkPass(oPass)) return false;
+		setPass(nPass);
+		return true;
+	}
 }

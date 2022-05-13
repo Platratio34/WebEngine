@@ -14,10 +14,7 @@ import nanoHTTPD.util.ServerRunner;
 import userEngine.User;
 import userEngine.UserDirectory;
 import webEngine.pageTypes.RedirectPage;
-import webEngine.pages.Home;
-import webEngine.pages.Login;
-import webEngine.pages.PermsPage;
-import webEngine.pages.ProfilePage;
+import webEngine.pages.*;
 
 public class WebServer extends NanoHTTPD {
 
@@ -38,6 +35,8 @@ public class WebServer extends NanoHTTPD {
 		addPage(new Login());
 		addPage(new PermsPage());
 		addPage(new ProfilePage());
+		addPage(new PassChangePage());
+		addPage(new AdminPanelPage());
 	}
 	
 	@Override
@@ -138,7 +137,7 @@ public class WebServer extends NanoHTTPD {
 	}
 	public static Response redirectLogin(URL path) {
 		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to login");
-		r.addHeader("Location", "/login?target=\"/" + path + "\"");
+		r.addHeader("Location", "/login?target=/" + path + "");
 		return r;
 	}
 	
@@ -158,12 +157,12 @@ public class WebServer extends NanoHTTPD {
 		peter.setPerm(ProfilePage.VIEW_OTHERS_PERM, true);
 		peter.setPerm("admin.*", true);
 		server.users.addUser(peter);
-		System.out.println(peter.serialize());
+//		System.out.println(peter.serialize());
 		
 		User admin = new User("Admin",1,"ThisIsTheAdminPassword");
 		admin.setPerm("user.*", true);
 		server.users.addUser(admin);
-		System.out.println(admin.serialize());
+//		System.out.println(admin.serialize());
 		
 		ServerRunner.executeInstance(server);
 	}

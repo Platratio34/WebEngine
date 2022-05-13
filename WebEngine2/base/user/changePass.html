@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Peter Light Ploter - Profile</title>
+		<title>Peter Web Engine - Password Change</title>
 		<link rel="stylesheet" href="/style/base">
 		<script src="/script/base" charset="utf-8"></script>
 	</head>
@@ -20,7 +20,7 @@
 				<tr>
 					<td><a class="navLink" href="/home">Home</a></td>
 					<td><a class="navLink" href="/user/changePass">Change Password</a></td>
-					<td data-perm="admin" style="display:none"><a class="navLink" href="/admin">Admin Dashboard</a></td>
+					<td data-perm="admin.panel" style="display:none"><a class="navLink" href="/admin">Admin Dashboard</a></td>
 				</tr>
 			</table>
 		</div>
@@ -62,7 +62,8 @@
 				document.getElementById("passMismatch").style.display = "inline-block";
 				return;
 			}
-			httpPostAsync2("/user/setPass", "", "oPass="+oPass+"&nPass="+nPass, function(res) {
+			document.getElementById("passMismatch").style.display = "none";
+			httpPostAsync2("/user/changePass", "", "{\"oPass\":\""+oPass+"\",\"nPass\":\""+nPass+"\"}", function(res) {
 				if(res.status == 200) {
 					window.location.href = "/user/profile";
 				} else {

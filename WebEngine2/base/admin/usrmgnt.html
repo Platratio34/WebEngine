@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Peter Light Ploter - Admin - User Managment</title>
+		<title>Peter Web Engine - Admin - User Managment</title>
 		<link rel="stylesheet" href="/style/base">
 		<script src="/script/base" charset="utf-8"></script>
 	</head>
@@ -96,11 +96,23 @@
 				newName = document.getElementById("newUser.name").value
 				newPass = document.getElementById("newUser.pass").value
 				newPerm = document.getElementById("newUser.perm").value
-				httpPostAsync("/admin/newUser", "", "name="+newName+"&pass="+newPass+"&perm="+newPerm, function(res) {alert(res);initL()})
+				body = {
+					action: "newUser",
+					data: {
+						name: newName,
+						pass: newPass,
+						perm: newPerm
+					}
+				}
+				httpPostAsync("/admin/action", "", body, function(res) {alert(res);initL()})
 			}
 
 			function initL() {
-				httpGetAsync("/admin/users?list", function(res) {
+				body = {
+					action: "listUsers",
+					data: {}
+				}
+				httpPostAsync("/admin/action", "", body function(res) {
 					// console.log(res)
 					var list = document.getElementById("userList");
 					list.innerHTML = "";
@@ -182,7 +194,14 @@
 
 			function changePerm(action) {
 				var perm = document.getElementById("changePerms."+action).value
-				httpPostAsync2("/admin/user", "" , "action="+action+"Perm&perm="+perm+"&user="+cUser.name, function(res){
+				body = {
+					action: action+"Perm",
+					data: {
+						perm: perm,
+						user: cUser.name
+					}
+				}
+				httpPostAsync2("/admin/action", "" , body, function(res){
 					if(res.status == 200) {
 						initL();
 					} else {
@@ -216,7 +235,14 @@
 				}
 
 				pass = document.getElementById("setPass.new1").value
-				httpPostAsync("/admin/user", "", "action=setPass&user="+cUser.name+"&pass="+pass, function(res){alert(res)})
+				body = {
+					action: "setPass",
+					data: {
+						user: cUser.name,
+						pass: pass
+					}
+				}
+				httpPostAsync("/admin/action", "", body, function(res){alert(res)})
 			}
 
 			function validatePass() {

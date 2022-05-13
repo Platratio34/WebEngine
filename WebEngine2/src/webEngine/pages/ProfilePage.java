@@ -10,7 +10,6 @@ import userEngine.User;
 import webEngine.URL;
 import webEngine.WebAction;
 import webEngine.WebPage;
-import webEngine.WebServer;
 
 public class ProfilePage extends WebPage {
 	
@@ -18,7 +17,7 @@ public class ProfilePage extends WebPage {
 
 	public ProfilePage() {
 		super("user/profile", true);
-		idPath = 2;
+		idPath = 3;
 	}
 
 	@Override

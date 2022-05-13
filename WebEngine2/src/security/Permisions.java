@@ -26,6 +26,9 @@ public class Permisions implements JsonSerializable {
 			return perms.get(perm);
 		}
 		String[] p = perm.split("\\.");
+		if(!perm.contains(".")) {
+			p = new String[] {perm};
+		}
 		boolean o = false;
 		for(int i = 0 ; i < p.length; i++) {
 			String P = permArrToString(p, i) + ".*";
