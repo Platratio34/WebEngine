@@ -8,6 +8,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="//athena.root/Students/705912/CS-AdvPrj-P7/mysql-connector/mysql-connector-java-8.0.28.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pcral/eclipse-workspace/Jars/mysql-connector-java-8.0.30.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

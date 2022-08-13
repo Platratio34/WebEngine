@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import dataManagment.JsonObj;
-import nanoHTTPD.NanoHTTPD.CookieHandler;
-import nanoHTTPD.NanoHTTPD.Method;
-import nanoHTTPD.NanoHTTPD.Response;
+import org.nanohttpd.protocols.http.content.CookieHandler;
+import org.nanohttpd.protocols.http.request.Method;
+import org.nanohttpd.protocols.http.response.Response;
+import org.nanohttpd.protocols.http.response.Status;
 import userEngine.User;
 import webEngine.URL;
 import webEngine.WebAction;
@@ -37,7 +38,7 @@ public class PassChangePage extends WebPage {
 			if(server.users.changePass(u, oPass, nPass)) {
 				return returnOkPlain("Password changed");
 			}
-			return newFixedLengthResponse(Response.Status.UNAUTHORIZED, PLAINTEXT, "Incorrect password");
+			return newFixedLengthResponse(Status.UNAUTHORIZED, PLAINTEXT, "Incorrect password");
 		}
 		return badRequest("Invalid method");
 	}

@@ -5,10 +5,11 @@ import java.util.List;
 
 import dataManagment.JsonObj;
 import dataManagment.JsonSerializable;
-import nanoHTTPD.NanoHTTPD;
-import nanoHTTPD.NanoHTTPD.CookieHandler;
-import nanoHTTPD.NanoHTTPD.Method;
-import nanoHTTPD.NanoHTTPD.Response;
+import org.nanohttpd.protocols.http.NanoHTTPD;
+import org.nanohttpd.protocols.http.content.CookieHandler;
+import org.nanohttpd.protocols.http.request.Method;
+import org.nanohttpd.protocols.http.response.Response;
+import org.nanohttpd.protocols.http.response.Status;
 import userEngine.User;
 
 public abstract class WebPage {
@@ -58,19 +59,19 @@ public abstract class WebPage {
 	public abstract Response serve(URL path, Method method, HashMap<String, List<String>> params, String body, User u, CookieHandler cookies);
 	
 	protected static Response returnPage(String path) {
-		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, HTML, PageLoader.getPage(path));
+		return Response.newFixedLengthResponse(Status.OK, HTML, PageLoader.getPage(path));
 	}
-	protected static Response newFixedLengthResponse(Response.Status status, String mimeType, String data) {
-		return NanoHTTPD.newFixedLengthResponse(status, mimeType, data);
+	protected static Response newFixedLengthResponse(Status status, String mimeType, String data) {
+		return Response.newFixedLengthResponse(status, mimeType, data);
 	}
 	protected static Response badRequest(String msg) {
-		return NanoHTTPD.newFixedLengthResponse(Response.Status.BAD_REQUEST, PLAINTEXT, msg);
+		return Response.newFixedLengthResponse(Status.BAD_REQUEST, PLAINTEXT, msg);
 	}
 	protected static Response returnOkPlain(String msg) {
-		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, PLAINTEXT, msg);
+		return Response.newFixedLengthResponse(Status.OK, PLAINTEXT, msg);
 	}
 	protected static Response returnOkJSON(String msg) {
-		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, "test/json", msg);
+		return Response.newFixedLengthResponse(Status.OK, "test/json", msg);
 	}
 	protected static Response returnOkJSON(JsonObj obj) {
 		return returnOkJSON(obj.toString());
@@ -79,7 +80,7 @@ public abstract class WebPage {
 		return returnOkJSON(obj.serialize().toString());
 	}
 	protected static Response defaultPage(String msg) {
-		return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, HTML, PageLoader.getDefaultPage(msg));
+		return Response.newFixedLengthResponse(Status.OK, HTML, PageLoader.getDefaultPage(msg));
 	}
 
 	public URL getURL() {

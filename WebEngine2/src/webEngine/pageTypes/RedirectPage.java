@@ -3,9 +3,9 @@ package webEngine.pageTypes;
 import java.util.HashMap;
 import java.util.List;
 
-import nanoHTTPD.NanoHTTPD.CookieHandler;
-import nanoHTTPD.NanoHTTPD.Method;
-import nanoHTTPD.NanoHTTPD.Response;
+import org.nanohttpd.protocols.http.content.CookieHandler;
+import org.nanohttpd.protocols.http.request.Method;
+import org.nanohttpd.protocols.http.response.Response;
 import userEngine.User;
 import webEngine.URL;
 import webEngine.WebAction;

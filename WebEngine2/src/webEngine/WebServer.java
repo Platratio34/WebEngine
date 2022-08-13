@@ -9,8 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import database.MySQL;
-import nanoHTTPD.NanoHTTPD;
-import nanoHTTPD.util.ServerRunner;
+import org.nanohttpd.protocols.http.*;
+import org.nanohttpd.protocols.http.content.CookieHandler;
+import org.nanohttpd.protocols.http.request.Method;
+import org.nanohttpd.protocols.http.response.Response;
+import org.nanohttpd.protocols.http.response.Status;
+import org.nanohttpd.util.ServerRunner;
 import userEngine.User;
 import userEngine.UserDirectory;
 import webEngine.pageTypes.RedirectPage;
@@ -52,9 +56,9 @@ public class WebServer extends NanoHTTPD {
 				session.parseBody(map);
 				postData = map.get("postData");
 			} catch(IOException e) {
-				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOExceptoin: " + e.getMessage());
+				return Response.newFixedLengthResponse(Status.INTERNAL_ERROR, MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOExceptoin: " + e.getMessage());
 			} catch(ResponseException e) {
-				return newFixedLengthResponse(e.getStatus(), MIME_PLAINTEXT, e.getMessage());
+				return Response.newFixedLengthResponse(e.getStatus(), MIME_PLAINTEXT, e.getMessage());
 			}
 		}
 		
@@ -73,18 +77,18 @@ public class WebServer extends NanoHTTPD {
 		if(url.equals("favicon.ico")) {
 			try {
 				InputStream is = new FileInputStream(new File("base/favicon.ico"));
-				return newChunkedResponse(Response.Status.OK, "image/x-icon", is);
+				return Response.newChunkedResponse(Status.OK, "image/x-icon", is);
 			} catch (IOException e) {
 				System.out.println("Faild to load favicon.ico");
 				e.printStackTrace();
-				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Failed to load icon");
+				return Response.newFixedLengthResponse(Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Failed to load icon");
 			}
 		}
 		if(url.equalsAt("script", 0)) {
-			return newFixedLengthResponse(Response.Status.OK, "text/javascript", PageLoader.getJS(url.toString(1)));
+			return Response.newFixedLengthResponse(Status.OK, "text/javascript", PageLoader.getJS(url.toString(1)));
 		}
 		if(url.equalsAt("style", 0)) {
-			return newFixedLengthResponse(Response.Status.OK, "text/css", PageLoader.getCSS(url.toString(1)));
+			return Response.newFixedLengthResponse(Status.OK, "text/css", PageLoader.getCSS(url.toString(1)));
 		}
 		WebPage page = getPage(url);
 		if(page != null) {
@@ -96,10 +100,10 @@ public class WebServer extends NanoHTTPD {
 					return page.serve(url, method, params, postData, user, cookies);
 				} catch(Exception e) {
 					e.printStackTrace();
-					return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("Failed to server page, internal error"));
+					return Response.newFixedLengthResponse(Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("Failed to server page, internal error"));
 				}
 			} else if(act.act == WebAction.Act.BLOCK) {
-				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("You can not acces this page because " + act.data));
+				return Response.newFixedLengthResponse(Status.INTERNAL_ERROR, MIME_HTML, PageLoader.getDefaultPage("You can not acces this page because " + act.data));
 			} else if(act.act == WebAction.Act.REDIRECT_TEMP) {
 				return redirectResponse(act.data);
 			} else if(act.act == WebAction.Act.REDIRECT_LOGIN) {
@@ -127,16 +131,16 @@ public class WebServer extends NanoHTTPD {
 	public static Response missingPage(URL url) {
 		String page = PageLoader.getPage("404.html");
 		page = page.replace("%Path%", url.toString());
-		return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_HTML, page);
+		return Response.newFixedLengthResponse(Status.NOT_FOUND, MIME_HTML, page);
 	}
 	
 	public static Response redirectResponse(String dest) {
-		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to " + dest);
+		Response r = Response.newFixedLengthResponse(Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to " + dest);
 		r.addHeader("Location", dest);
 		return r;
 	}
 	public static Response redirectLogin(URL path) {
-		Response r = NanoHTTPD.newFixedLengthResponse(Response.Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to login");
+		Response r = Response.newFixedLengthResponse(Status.TEMPORARY_REDIRECT, "text/plain", "Redirecting to login");
 		r.addHeader("Location", "/login?target=/" + path + "");
 		return r;
 	}

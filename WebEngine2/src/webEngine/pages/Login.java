@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import dataManagment.JsonObj;
-import nanoHTTPD.NanoHTTPD.CookieHandler;
-import nanoHTTPD.NanoHTTPD.Method;
-import nanoHTTPD.NanoHTTPD.Response;
+import org.nanohttpd.protocols.http.content.CookieHandler;
+import org.nanohttpd.protocols.http.request.Method;
+import org.nanohttpd.protocols.http.response.Response;
 import security.Key;
 import userEngine.User;
 import webEngine.URL;
@@ -35,7 +35,7 @@ public class Login extends WebPage {
 			if(obj.hasKey("logout")) {
 				cookies.delete("userKey");
 				cookies.delete("user");
-				return newFixedLengthResponse(Response.Status.OK, PLAINTEXT, "Logout Successful");
+				return returnOkPlain("Logout Successful");
 			}
 			return badRequest("Must have JSON body with elements 'user' and 'pass' or 'logout'");
 		}
@@ -43,14 +43,14 @@ public class Login extends WebPage {
 		String pass = obj.getKey("pass").string();
 		Key<User> key = server.users.tryLoginByName(user, pass);
 		if(key == null) {
-			return newFixedLengthResponse(Response.Status.OK, PLAINTEXT, "Invalid Username or Password");
+			return returnOkPlain("Invalid Username or Password");
 		}
 		cookies.set("userKey",key.getKey(),1);
 //		System.out.println(key.getKey());
 //		System.out.println(cookies.read("userKey"));
 //		cookies.set("user",key.getValue().getName(),1);
 //		System.out.println(cookies.read("user"));
-		return newFixedLengthResponse(Response.Status.OK, PLAINTEXT, "Login Successful");
+		return returnOkPlain("Login Successful");
 	}
 
 }
